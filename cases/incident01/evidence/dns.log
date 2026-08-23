@@ -1,0 +1,4 @@
+2026-08-15T09:43:58Z client=10.10.10.15 query=updates.examplecdn.net type=A response=203.0.113.77
+2026-08-15T09:44:03Z client=10.10.10.15 query=updates.examplecdn.net type=A response=203.0.113.77
+2026-08-15T09:46:18Z client=10.10.10.15 query=cdn-assets.examplecdn.net type=A response=198.51.100.24
+2026-08-15T09:47:51Z client=10.10.10.15 query=unknown-service.example.net type=A response=192.0.2.55

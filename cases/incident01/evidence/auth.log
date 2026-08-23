@@ -1,0 +1,15 @@
+2026-08-15T09:41:02Z sshd[4812]: Failed password for invalid user admin from 185.199.110.47 port 42118 ssh2
+2026-08-15T09:41:05Z sshd[4814]: Failed password for root from 185.199.110.47 port 42121 ssh2
+2026-08-15T09:41:08Z sshd[4817]: Failed password for root from 185.199.110.47 port 42127 ssh2
+2026-08-15T09:41:11Z sshd[4820]: Failed password for root from 185.199.110.47 port 42133 ssh2
+2026-08-15T09:41:14Z sshd[4823]: Failed password for root from 185.199.110.47 port 42140 ssh2
+2026-08-15T09:41:19Z sshd[4829]: Failed password for deploy from 185.199.110.47 port 42152 ssh2
+2026-08-15T09:41:24Z sshd[4832]: Failed password for deploy from 185.199.110.47 port 42161 ssh2
+2026-08-15T09:41:31Z sshd[4838]: Accepted password for deploy from 185.199.110.47 port 42175 ssh2
+2026-08-15T09:41:32Z sshd[4838]: pam_unix(sshd:session): session opened for user deploy
+2026-08-15T09:42:03Z sudo[4911]: deploy : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/id
+2026-08-15T09:42:11Z sudo[4914]: deploy : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/uname -a
+2026-08-15T09:43:07Z sudo[4930]: deploy : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/cat /etc/passwd
+2026-08-15T09:44:19Z sshd[5012]: Accepted publickey for deploy from 10.10.10.15 port 51222 ssh2
+2026-08-15T09:44:19Z sshd[5012]: pam_unix(sshd:session): session opened for user deploy
+2026-08-15T09:47:32Z sshd[5121]: session closed for user deploy

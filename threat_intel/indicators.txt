@@ -1,0 +1,10 @@
+# Internal training dataset
+# These indicators are fictional documentation-only values.
+
+185.199.110.47    source_ip    suspicious
+203.0.113.77      destination  suspicious
+198.51.100.24     destination  suspicious
+192.0.2.55        destination  suspicious
+
+/tmp/.cache_update  suspicious_file
+deploy              compromised_account_candidate
