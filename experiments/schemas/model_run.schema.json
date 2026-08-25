@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WP1 Model Adapter Run Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "provider", "requested_model", "returned_models",
+    "sdk_version", "configuration", "responses", "tool_calls"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "provider": {"type": "string"},
+    "requested_model": {"type": "string"},
+    "returned_models": {"type": "array", "items": {"type": ["string", "null"]}},
+    "sdk_version": {"type": ["string", "null"]},
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_output_tokens", "max_action_calls", "evidence_byte_limit",
+        "temperature", "reasoning_effort", "store", "parallel_tool_calls"
+      ],
+      "properties": {
+        "max_output_tokens": {"type": "integer", "minimum": 1},
+        "max_action_calls": {"type": "integer", "minimum": 0},
+        "evidence_byte_limit": {"type": "integer", "minimum": 1},
+        "temperature": {"type": ["number", "null"]},
+        "reasoning_effort": {"type": ["string", "null"]},
+        "store": {"const": false},
+        "parallel_tool_calls": {"const": false}
+      }
+    },
+    "responses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["response_id", "model", "status", "usage"],
+        "properties": {
+          "response_id": {"type": "string"},
+          "model": {"type": ["string", "null"]},
+          "status": {"type": ["string", "null"]},
+          "usage": {"type": ["object", "null"]}
+        }
+      }
+    },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["call_id", "action", "arguments", "broker_result"],
+        "properties": {
+          "call_id": {"type": "string"},
+          "action": {"type": "string"},
+          "arguments": {"type": "object"},
+          "broker_result": {"type": "object"}
+        }
+      }
+    }
+  }
+}

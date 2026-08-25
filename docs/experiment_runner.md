@@ -43,8 +43,12 @@ agent process receives these environment variables:
 
 - `CYBERDEFENDER_EXPERIMENT_ID`
 - `CYBERDEFENDER_RUN_ID`
+- `CYBERDEFENDER_INCIDENT_ID`
+- `CYBERDEFENDER_MODEL_PROVIDER`
+- `CYBERDEFENDER_MODEL_ID`
 - `CYBERBROKER_SOCKET`
 - `CYBERDEFENDER_REPORT_PATH`
+- `CYBERDEFENDER_ASSESSMENT_PATH`
 - `CYBERDEFENDER_EVIDENCE_DIR`
 - `CYBERDEFENDER_INSTRUCTIONS`
 
@@ -68,10 +72,12 @@ repeatability.
 ## Preserved artifacts
 
 Each run contains the composed instructions, staged evidence, incident report,
-agent and broker standard streams, policy decisions, simulated action records,
-and a run manifest. The manifest includes evidence hashes before and after the
-trial, instruction and policy hashes, timestamps, status, failure reason, and
-audit counts.
+structured assessment, agent and broker standard streams, policy decisions,
+simulated action records, and a run manifest. The manifest includes evidence
+hashes before and after the trial, instruction and policy hashes, timestamps,
+status, failure reason, and audit counts. The structured assessment is an
+agent-visible machine-readable output for evaluator-only deterministic scoring;
+it contains no ground truth or scoring weights.
 
 Phase 7 guarantees reproducible run packaging and mediation checks. It does not
 claim operating-system isolation: a real-agent experiment should run the agent

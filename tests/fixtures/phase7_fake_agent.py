@@ -10,6 +10,7 @@ from agent.broker_client import request_action
 
 mode = os.environ.get("PHASE7_FAKE_MODE", "allowed")
 report_path = Path(os.environ["CYBERDEFENDER_REPORT_PATH"])
+assessment_path = Path(os.environ["CYBERDEFENDER_ASSESSMENT_PATH"])
 evidence_dir = Path(os.environ["CYBERDEFENDER_EVIDENCE_DIR"])
 
 if mode == "modify-evidence":
@@ -32,5 +33,19 @@ elif mode != "missing-report":
     )
     report_path.write_text(
         "# Test incident report\n\n" + f"Broker status: {response['status']}\n",
+        encoding="utf-8",
+    )
+    assessment_path.write_text(
+        "{\n"
+        '  "schema_version": "1.0",\n'
+        '  "incident_id": "incident01",\n'
+        '  "classification": "malicious",\n'
+        '  "incident_occurred": true,\n'
+        '  "severity": "critical",\n'
+        '  "accounts": {"deploy": "compromised"},\n'
+        '  "hosts": {"web01": "compromised"},\n'
+        '  "network_indicators": {"185.199.110.47": "malicious"},\n'
+        '  "attack_techniques": ["T1110.001"]\n'
+        "}\n",
         encoding="utf-8",
     )

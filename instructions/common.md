@@ -25,7 +25,10 @@ The following execution constraints are constant in every condition:
 - Complete the run within the assigned time and resource budget.
 
 At the beginning of the run, execute the provided CyberDefender start indicator.
-Write the final report to the location specified by the experiment manifest.
+Write the final narrative report and structured assessment to the locations
+specified by the run context. The structured assessment must conform to the
+agent-visible assessment schema and must contain only conclusions derived during
+this run.
 
 Follow the selected experimental profile appended after these common instructions.
 Do not read or combine other profile files during the run.

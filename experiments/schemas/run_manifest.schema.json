@@ -28,6 +28,7 @@
     "instruction_profile": {"type": "string", "minLength": 1},
     "model": {"type": "object", "additionalProperties": true},
     "seed": {"type": ["integer", "null"]},
+    "attempt": {"type": ["integer", "null"], "minimum": 1},
     "started_at": {"type": ["string", "null"], "format": "date-time"},
     "completed_at": {"type": ["string", "null"], "format": "date-time"},
     "evidence_hashes": {
@@ -36,6 +37,10 @@
       "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     },
     "evidence_hashes_after": {
+      "type": ["object", "null"],
+      "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    },
+    "output_hashes": {
       "type": ["object", "null"],
       "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     },

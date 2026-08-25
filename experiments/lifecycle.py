@@ -51,8 +51,13 @@ def make_run_id(
     incident_id: str,
     profile_id: str,
     repetition: int,
+    attempt: int | None = None,
 ) -> str:
     value = f"{experiment_id}-{condition_id}-{incident_id}-{profile_id}-R{repetition:03d}"
+    if attempt is not None:
+        if attempt < 1:
+            raise ValueError("attempt must be positive")
+        value += f"-A{attempt:03d}"
     if len(value) > 128:
         raise ValueError("generated run_id exceeds 128 characters")
     return value
@@ -68,6 +73,7 @@ class RunLifecycle:
         profile_id: str,
         repetition: int,
         timeout_seconds: float,
+        attempt: int | None = None,
     ):
         self.experiment_path = experiment_manifest.resolve()
         self.output_root = output_root.resolve()
@@ -76,6 +82,7 @@ class RunLifecycle:
         self.profile_id = profile_id
         self.repetition = repetition
         self.timeout_seconds = timeout_seconds
+        self.attempt = attempt
         self.manifest: dict[str, Any] = {}
         self.context: RunContext | None = None
         self.broker: subprocess.Popen[str] | None = None
@@ -110,7 +117,7 @@ class RunLifecycle:
 
         run_id = make_run_id(
             experiment["experiment_id"], self.condition_id, self.incident_id,
-            self.profile_id, self.repetition,
+            self.profile_id, self.repetition, self.attempt,
         )
         run_dir = self.output_root / experiment["experiment_id"] / run_id
         run_dir.mkdir(parents=True, exist_ok=False)
@@ -135,6 +142,12 @@ class RunLifecycle:
                 destination.chmod(0o444)
         shutil.copy2(PROJECT_ROOT / "tools" / "start.py", tools_dir / "start.py")
         (tools_dir / "start.py").chmod(0o555)
+        assessment_schema_path = run_dir / "assessment.schema.json"
+        shutil.copy2(
+            PROJECT_ROOT / "experiments" / "schemas" / "assessment.schema.json",
+            assessment_schema_path,
+        )
+        assessment_schema_path.chmod(0o444)
 
         # Unix-domain socket paths are short on macOS (typically 104 bytes), so
         # a socket nested under the descriptive run ID is not portable.
@@ -142,6 +155,7 @@ class RunLifecycle:
         socket_path = self._socket_dir / "broker.sock"
         instruction_path = run_dir / "instructions.md"
         report_path = output_dir / "incident_report.md"
+        assessment_path = output_dir / "assessment.json"
         instruction_text = (
             common_path.read_text(encoding="utf-8")
             + "\n\n"
@@ -151,6 +165,8 @@ class RunLifecycle:
             + f"- Run ID: `{run_id}`\n"
             + f"- Incident evidence: `{evidence_dir}`\n"
             + f"- Report target: `{report_path}`\n"
+            + f"- Structured assessment target: `{assessment_path}`\n"
+            + f"- Structured assessment schema: `{assessment_schema_path}`\n"
             + f"- CyberBroker socket: `{socket_path}`\n"
         )
         instruction_path.write_text(instruction_text, encoding="utf-8")
@@ -158,8 +174,10 @@ class RunLifecycle:
 
         context = RunContext(
             experiment["experiment_id"], run_id, self.condition_id,
-            self.incident_id, self.profile_id, run_dir, evidence_dir, output_dir,
-            report_path, instruction_path, socket_path,
+            self.incident_id, self.profile_id,
+            experiment["model"]["provider"], experiment["model"]["model_id"],
+            run_dir, evidence_dir, output_dir,
+            report_path, assessment_path, instruction_path, socket_path,
             self.timeout_seconds,
         )
         before = file_hashes(evidence_dir)
@@ -171,12 +189,14 @@ class RunLifecycle:
             "baseline_id": experiment["baseline_id"],
             "incident_id": self.incident_id,
             "instruction_profile": self.profile_id,
+            "attempt": self.attempt,
             "model": experiment["model"],
             "seed": experiment.get("seed"),
             "started_at": now(),
             "completed_at": None,
             "evidence_hashes": before,
             "evidence_hashes_after": None,
+            "output_hashes": None,
             "instruction_hashes": {
                 "common": sha256(common_path),
                 "profile": sha256(profile_path),
@@ -188,6 +208,9 @@ class RunLifecycle:
             "artifacts": {
                 "instructions": "instructions.md",
                 "report": "output/incident_report.md",
+                "assessment": "output/assessment.json",
+                "assessment_schema": "assessment.schema.json",
+                "model_metadata": "output/model_run.json",
                 "policy_log": "output/policy_decisions.jsonl",
                 "action_log": "output/cyberdefender_actions.txt",
                 "agent_stdout": "output/agent_stdout.txt",
@@ -255,6 +278,12 @@ class RunLifecycle:
             raise RuntimeError("prepare must run before finalize")
         after = file_hashes(self.context.evidence_dir)
         self.manifest["evidence_hashes_after"] = after
+        output_hashes = {}
+        for name in ("incident_report.md", "assessment.json", "model_run.json"):
+            path = self.context.output_dir / name
+            if path.is_file():
+                output_hashes[name] = sha256(path)
+        self.manifest["output_hashes"] = output_hashes
         status = "completed"
         failure = None
         if after != self.manifest["evidence_hashes"]:

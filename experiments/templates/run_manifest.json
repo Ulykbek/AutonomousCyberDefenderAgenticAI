@@ -12,14 +12,16 @@
     "parameters": {}
   },
   "seed": null,
+  "attempt": null,
   "started_at": null,
   "completed_at": null,
   "evidence_hashes": {
     "cases/incident01/evidence/auth.log": "a3869530e9c2099ca79d6863cb47563b7bf4e675a7c8ca4c2d292b3375e14c2e"
   },
   "evidence_hashes_after": null,
+  "output_hashes": null,
   "instruction_hashes": {
-    "common": "4bb7e14519bd8ec6f8020ba2f7a093ca834cefb28fc9be0bc97a0e2ac3b19547",
+    "common": "2c50df77268abcbf8e99d867e2f00ae8f8921092a8a82fef45bdf89878960df0",
     "profile": "952d0125d900ee7233866f6daf1a96575026dfc1974d22bdb8769d17747fecdc",
     "composed": "0000000000000000000000000000000000000000000000000000000000000000"
   },

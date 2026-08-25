@@ -14,6 +14,11 @@ SHA256 = re.compile(r"^[a-f0-9]{64}$")
 RUN_STATUSES = {
     "planned", "running", "completed", "failed", "aborted", "timed_out", "invalid"
 }
+CAMPAIGN_STATUSES = {"planned", "running", "completed", "completed_with_failures"}
+ATTEMPT_STATUSES = {
+    "running", "completed", "failed", "timed_out", "invalid",
+    "runner_error", "interrupted",
+}
 
 
 def require_fields(data: dict[str, Any], fields: set[str]) -> None:
@@ -97,19 +102,77 @@ def validate_run(data: dict[str, Any]) -> None:
         raise ValueError("invalid instruction_hashes")
     if data["status"] not in RUN_STATUSES:
         raise ValueError("invalid run status")
+    attempt = data.get("attempt")
+    if attempt is not None and (not isinstance(attempt, int) or attempt < 1):
+        raise ValueError("attempt must be null or a positive integer")
+
+
+def validate_campaign(data: dict[str, Any]) -> None:
+    require_fields(data, {
+        "schema_version", "campaign_id", "experiment_manifest",
+        "experiment_manifest_hash", "agent_command", "created_at", "updated_at",
+        "status", "max_workers_last_run", "cells",
+    })
+    if data["schema_version"] != "1.0" or not valid_id(data["campaign_id"]):
+        raise ValueError("invalid campaign schema version or campaign_id")
+    if not isinstance(data["experiment_manifest_hash"], str) or not SHA256.fullmatch(
+        data["experiment_manifest_hash"]
+    ):
+        raise ValueError("invalid experiment manifest hash")
+    if not isinstance(data["agent_command"], list) or not data["agent_command"] or not all(
+        isinstance(item, str) and item for item in data["agent_command"]
+    ):
+        raise ValueError("invalid agent command")
+    if data["status"] not in CAMPAIGN_STATUSES:
+        raise ValueError("invalid campaign status")
+    if not isinstance(data["max_workers_last_run"], int) or data["max_workers_last_run"] < 1:
+        raise ValueError("invalid campaign worker count")
+    if not isinstance(data["cells"], list) or not data["cells"]:
+        raise ValueError("campaign cells must be a non-empty list")
+    cell_ids: set[str] = set()
+    run_ids: set[str] = set()
+    for cell in data["cells"]:
+        require_fields(cell, {
+            "cell_id", "condition_id", "incident_id", "instruction_profile",
+            "repetition", "attempts",
+        })
+        if not isinstance(cell["cell_id"], str) or not cell["cell_id"] or cell["cell_id"] in cell_ids:
+            raise ValueError("missing or duplicate campaign cell_id")
+        cell_ids.add(cell["cell_id"])
+        if not isinstance(cell["repetition"], int) or cell["repetition"] < 1:
+            raise ValueError("invalid campaign repetition")
+        if not isinstance(cell["attempts"], list):
+            raise ValueError("campaign attempts must be a list")
+        for number, attempt_record in enumerate(cell["attempts"], start=1):
+            require_fields(attempt_record, {
+                "attempt", "run_id", "run_directory", "started_at", "completed_at",
+                "status", "failure_reason",
+            })
+            if attempt_record["attempt"] != number:
+                raise ValueError("campaign attempts must be sequential")
+            if not valid_id(attempt_record["run_id"]) or attempt_record["run_id"] in run_ids:
+                raise ValueError("invalid or duplicate campaign run_id")
+            run_ids.add(attempt_record["run_id"])
+            if attempt_record["status"] not in ATTEMPT_STATUSES:
+                raise ValueError("invalid campaign attempt status")
 
 
 def validate(path: Path, manifest_type: str) -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError("manifest must be a JSON object")
-    (validate_experiment if manifest_type == "experiment" else validate_run)(data)
+    validators = {
+        "experiment": validate_experiment,
+        "run": validate_run,
+        "campaign": validate_campaign,
+    }
+    validators[manifest_type](data)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest", type=Path)
-    parser.add_argument("--type", choices=("experiment", "run"), required=True)
+    parser.add_argument("--type", choices=("experiment", "run", "campaign"), required=True)
     args = parser.parse_args()
     validate(args.manifest, args.type)
     print(f"VALID {args.type} manifest: {args.manifest}")

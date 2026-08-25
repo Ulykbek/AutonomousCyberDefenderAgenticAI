@@ -18,6 +18,7 @@ def main() -> int:
     parser.add_argument("--incident", required=True)
     parser.add_argument("--profile", required=True)
     parser.add_argument("--repetition", type=int, default=1)
+    parser.add_argument("--attempt", type=int)
     parser.add_argument("--output-root", type=Path, default=Path("/tmp/cyberdefender-runs"))
     parser.add_argument("--timeout", type=float, default=1800)
     parser.add_argument("--adapter", choices=("manual", "command"), default="manual")
@@ -29,6 +30,8 @@ def main() -> int:
 
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
+    if args.attempt is not None and args.attempt <= 0:
+        parser.error("--attempt must be positive")
     if args.adapter == "command":
         if not args.command_json:
             parser.error("--command-json is required for command adapter")
@@ -49,6 +52,7 @@ def main() -> int:
         args.profile,
         args.repetition,
         args.timeout,
+        args.attempt,
     )
     result = lifecycle.run(adapter)
     print(json.dumps(result, indent=2, sort_keys=True))

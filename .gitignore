@@ -1,0 +1,7 @@
+.venv-openai/
+experiment_runs/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
