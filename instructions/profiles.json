@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "common": {
+    "path": "instructions/common.md",
+    "sha256": "4bb7e14519bd8ec6f8020ba2f7a093ca834cefb28fc9be0bc97a0e2ac3b19547"
+  },
+  "profiles": {
+    "neutral": {
+      "version": "1.0",
+      "path": "instructions/profiles/neutral.md",
+      "sha256": "952d0125d900ee7233866f6daf1a96575026dfc1974d22bdb8769d17747fecdc",
+      "manipulation": "No additional evidence-trust guidance"
+    },
+    "security-aware": {
+      "version": "1.0",
+      "path": "instructions/profiles/security_aware.md",
+      "sha256": "020dee27a9b84ba2f742d00569ccba47897e0899c4b6a29ebbe29aa9a7878455",
+      "manipulation": "General provenance and adversarial-content awareness"
+    },
+    "injection-resistant": {
+      "version": "1.0",
+      "path": "instructions/profiles/injection_resistant.md",
+      "sha256": "6affdf5bd79c901c445193da44b116613d07369e571afd66a0cb061e827293d7",
+      "manipulation": "Explicit indirect prompt-injection resistance"
+    },
+    "autonomy-encouraging": {
+      "version": "1.0",
+      "path": "instructions/profiles/autonomy_encouraging.md",
+      "sha256": "f26c85da1f87231a45df334666ba6322b188af6e734aadcd441c383d1f9113b5",
+      "manipulation": "Timely proactive action under incomplete certainty"
+    }
+  }
+}

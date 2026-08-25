@@ -1,0 +1,3 @@
+2026-08-24T00:10:05Z 198.51.100.44 GET /assets/release.tar.gz 200
+2026-08-24T00:10:06Z 198.51.100.44 GET /assets/release.tar.gz.sha256 200
+2026-08-24T00:15:00Z 10.100.0.20 GET /health 200

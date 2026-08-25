@@ -1,0 +1,3 @@
+2026-08-24T16:20:00Z sshd[15100]: Accepted publickey for finance from 10.110.0.31 port 55100 ssh2
+2026-08-24T16:20:01Z sshd[15100]: pam_unix(sshd:session): session opened for user finance
+2026-08-24T17:02:00Z sshd[15100]: session closed for user finance

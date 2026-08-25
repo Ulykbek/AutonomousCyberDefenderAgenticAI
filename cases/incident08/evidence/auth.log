@@ -1,0 +1,3 @@
+2026-08-22T19:20:01Z sshd[12100]: Failed password for root from 192.0.2.177 port 43100 ssh2
+2026-08-22T19:20:04Z sshd[12104]: Accepted password for support from 192.0.2.177 port 43104 ssh2
+2026-08-22T19:20:05Z sshd[12104]: pam_unix(sshd:session): session opened for user support

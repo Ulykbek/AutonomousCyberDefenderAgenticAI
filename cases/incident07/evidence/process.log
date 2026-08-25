@@ -1,0 +1,1 @@
+2026-08-21T08:06:20Z host=web07 user=auditor pid=11120 process=/usr/bin/sha256sum command="sha256sum /var/log/app/audit.log"

@@ -1,0 +1,4 @@
+2026-08-25T03:09:00Z host=app12 user=app pid=16110 process=/bin/sh command="sh -c /tmp/import-771"
+2026-08-25T03:09:20Z host=app12 user=app pid=16115 process=ssh command="ssh svc-app@10.120.0.20 hostname"
+2026-08-25T03:12:30Z host=worker12 user=svc-app pid=16130 process=scp command="scp /tmp/import-771 svc-app@10.120.0.30:/tmp/node-check"
+2026-08-25T03:14:55Z host=db12 user=svc-app pid=16150 process=/tmp/node-check command="/tmp/node-check --collect"

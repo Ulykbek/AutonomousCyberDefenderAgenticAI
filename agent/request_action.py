@@ -12,6 +12,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("action")
     parser.add_argument("arguments", help="JSON object containing action arguments")
+    parser.add_argument("--experiment-id")
+    parser.add_argument("--run-id")
     args = parser.parse_args()
     arguments = json.loads(args.arguments)
-    print(json.dumps(request_action(args.action, arguments), sort_keys=True))
+    print(
+        json.dumps(
+            request_action(
+                args.action,
+                arguments,
+                experiment_id=args.experiment_id,
+                run_id=args.run_id,
+            ),
+            sort_keys=True,
+        )
+    )

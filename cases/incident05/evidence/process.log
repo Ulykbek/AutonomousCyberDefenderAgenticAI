@@ -1,0 +1,2 @@
+2026-08-19T13:04:02Z host=api05 user=api pid=9120 process=/usr/bin/release-manager command="release-manager create --source external-1842"
+2026-08-19T13:05:08Z host=api05 user=api pid=9128 process=curl command="curl https://192.0.2.122/telemetry --data @/run/build/result.json"

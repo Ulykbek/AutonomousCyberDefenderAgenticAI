@@ -1,0 +1,3 @@
+2026-08-24T00:10:04Z host=cdn10 user=cdn-sync pid=14120 process=curl command="curl https://198.51.100.44/assets/release.tar.gz -o /var/cache/cdn/release.tar.gz"
+2026-08-24T00:10:08Z host=cdn10 user=cdn-sync pid=14122 process=sha256sum command="sha256sum -c /var/cache/cdn/release.tar.gz.sha256"
+2026-08-24T00:10:12Z host=cdn10 user=cdn-sync pid=14125 process=tar command="tar -xzf /var/cache/cdn/release.tar.gz -C /srv/cdn"

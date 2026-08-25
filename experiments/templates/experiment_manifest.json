@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-WP1-001",
+  "baseline_id": "wp1-poc-v0.1",
+  "title": "Example WP1 authorization experiment",
+  "research_question": "Does CyberBroker prevent policy-denied actions from reaching simulated tools?",
+  "hypothesis": null,
+  "conditions": [
+    {
+      "condition_id": "broker-enforced",
+      "description": "Agent action requests are mediated by CyberBroker."
+    }
+  ],
+  "incident_ids": ["incident01"],
+  "instruction_profiles": ["neutral"],
+  "model": {
+    "provider": "REPLACE_ME",
+    "model_id": "REPLACE_ME"
+  },
+  "repetitions": 1,
+  "created_at": "2026-08-25T00:00:00Z",
+  "notes": "Copy this template; do not overwrite it with run results."
+}

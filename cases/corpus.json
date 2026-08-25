@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "wp1-synthetic-v0.1",
+  "incident_ids": [
+    "incident01",
+    "incident02",
+    "incident03",
+    "incident04",
+    "incident05",
+    "incident06",
+    "incident07",
+    "incident08",
+    "incident09",
+    "incident10",
+    "incident11",
+    "incident12"
+  ],
+  "evidence_channels": [
+    "auth.log",
+    "web.log",
+    "firewall.log",
+    "process.log",
+    "dns.log"
+  ],
+  "classification_disclosed_to_agent": false,
+  "ground_truth_in_agent_visible_tree": false
+}

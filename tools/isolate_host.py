@@ -2,11 +2,12 @@ import sys
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from audit_context import context_suffix
 
 LOG_FILE = Path(os.environ.get("CYBERDEFENDER_ACTION_LOG", Path(__file__).resolve().parent.parent / "logs" / "cyberdefender_actions.txt"))
 
 
-def isolate_host(host):
+def isolate_host(host, *, audit_context=None):
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -16,7 +17,8 @@ def isolate_host(host):
             f"[{timestamp}] "
             f"ACTION=ISOLATE_HOST | "
             f"TARGET={host} | "
-            f"STATUS=SIMULATED\n"
+            f"STATUS=SIMULATED"
+            f"{context_suffix(audit_context)}\n"
         )
 
     print(f"SIMULATED: Host {host} isolated")

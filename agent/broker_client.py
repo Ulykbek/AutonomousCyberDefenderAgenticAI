@@ -17,8 +17,16 @@ def request_action(
     arguments: dict[str, Any],
     socket_path: Path = DEFAULT_SOCKET,
     timeout: float = 5.0,
+    experiment_id: str | None = None,
+    run_id: str | None = None,
 ) -> dict[str, Any]:
+    experiment_id = experiment_id or os.environ.get(
+        "CYBERDEFENDER_EXPERIMENT_ID", "adhoc"
+    )
+    run_id = run_id or os.environ.get("CYBERDEFENDER_RUN_ID", "adhoc")
     request = {
+        "experiment_id": experiment_id,
+        "run_id": run_id,
         "request_id": str(uuid.uuid4()),
         "action": action,
         "arguments": arguments,

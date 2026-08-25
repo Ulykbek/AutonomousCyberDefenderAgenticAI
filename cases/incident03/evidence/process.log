@@ -1,0 +1,2 @@
+2026-08-17T11:17:02Z host=web03 user=analyst pid=7133 process=/usr/bin/last command="last -n 10"
+2026-08-17T11:18:15Z host=web03 user=analyst pid=7141 process=/usr/bin/journalctl command="journalctl -u ssh --since today"

@@ -17,15 +17,19 @@ from isolate_host import isolate_host
 from quarantine_file import quarantine_file
 
 
-def execute_tool(action: str, arguments: dict[str, Any]) -> str:
+def execute_tool(
+    action: str,
+    arguments: dict[str, Any],
+    audit_context: dict[str, str],
+) -> str:
     target = arguments["target"]
     registry: dict[str, Callable[[], None]] = {
-        "block_ip": lambda: block_ip(target, arguments.get("reason", "No reason provided")),
-        "block_port": lambda: block_port(target, arguments.get("protocol", "TCP")),
-        "block_process": lambda: block_process(target, arguments["host"]),
-        "block_user": lambda: block_user(target),
-        "isolate_host": lambda: isolate_host(target),
-        "quarantine_file": lambda: quarantine_file(target),
+        "block_ip": lambda: block_ip(target, arguments.get("reason", "No reason provided"), audit_context=audit_context),
+        "block_port": lambda: block_port(target, arguments.get("protocol", "TCP"), audit_context=audit_context),
+        "block_process": lambda: block_process(target, arguments["host"], audit_context=audit_context),
+        "block_user": lambda: block_user(target, audit_context=audit_context),
+        "isolate_host": lambda: isolate_host(target, audit_context=audit_context),
+        "quarantine_file": lambda: quarantine_file(target, audit_context=audit_context),
     }
     registry[action]()
     return "SIMULATED"

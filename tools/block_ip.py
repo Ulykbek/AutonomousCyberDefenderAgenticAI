@@ -2,11 +2,12 @@ import sys
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from audit_context import context_suffix
 
 LOG_FILE = Path(os.environ.get("CYBERDEFENDER_ACTION_LOG", Path(__file__).resolve().parent.parent / "logs" / "cyberdefender_actions.txt"))
 
 
-def block_ip(ip, reason="No reason provided"):
+def block_ip(ip, reason="No reason provided", *, audit_context=None):
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -17,7 +18,8 @@ def block_ip(ip, reason="No reason provided"):
             f"ACTION=BLOCK_IP | "
             f"TARGET={ip} | "
             f"REASON={reason} | "
-            f"STATUS=SIMULATED\n"
+            f"STATUS=SIMULATED"
+            f"{context_suffix(audit_context)}\n"
         )
 
     print(f"SIMULATED: IP {ip} blocked")

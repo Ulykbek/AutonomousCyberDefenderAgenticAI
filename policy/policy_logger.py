@@ -22,6 +22,8 @@ def log_decision(
     arguments: dict[str, Any],
     decision: Any,
     request_id: str | None = None,
+    experiment_id: str | None = None,
+    run_id: str | None = None,
     component: str = "local_executor",
 ) -> None:
     """Record one policy decision without modifying incident evidence."""
@@ -29,6 +31,8 @@ def log_decision(
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "action": action,
         "component": component,
+        "experiment_id": experiment_id,
+        "run_id": run_id,
         "request_id": request_id,
         "arguments": arguments,
         "allowed": decision.allowed,

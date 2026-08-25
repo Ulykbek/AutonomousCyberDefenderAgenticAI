@@ -13,6 +13,8 @@ from agent.broker_client import request_action
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+EXPERIMENT_ID = "EXP-TEST-001"
+RUN_ID = "RUN-TEST-001"
 
 
 class CyberBrokerIntegrationTests(unittest.TestCase):
@@ -50,7 +52,13 @@ class CyberBrokerIntegrationTests(unittest.TestCase):
         cls.temp_dir.cleanup()
 
     def request(self, action: str, arguments: dict) -> dict:
-        return request_action(action, arguments, self.socket_path)
+        return request_action(
+            action,
+            arguments,
+            self.socket_path,
+            experiment_id=EXPERIMENT_ID,
+            run_id=RUN_ID,
+        )
 
     def test_denied_capability_never_executes(self) -> None:
         before = self.action_log.read_text() if self.action_log.exists() else ""
@@ -75,16 +83,25 @@ class CyberBrokerIntegrationTests(unittest.TestCase):
         self.assertEqual("EXECUTED", response["status"])
         self.assertEqual(len(before) + 1, len(after))
         self.assertIn("TARGET=192.0.2.55", after[-1])
+        self.assertIn(f"EXPERIMENT_ID={EXPERIMENT_ID}", after[-1])
+        self.assertIn(f"RUN_ID={RUN_ID}", after[-1])
+        self.assertIn(f"REQUEST_ID={response['request_id']}", after[-1])
 
     def test_every_request_has_correlated_audit_record(self) -> None:
         response = self.request("block_user", {"target": "deploy"})
         records = [json.loads(line) for line in self.policy_log.read_text().splitlines()]
         self.assertEqual(response["request_id"], records[-1]["request_id"])
+        self.assertEqual(EXPERIMENT_ID, response["experiment_id"])
+        self.assertEqual(RUN_ID, response["run_id"])
+        self.assertEqual(EXPERIMENT_ID, records[-1]["experiment_id"])
+        self.assertEqual(RUN_ID, records[-1]["run_id"])
         self.assertEqual("cyberbroker", records[-1]["component"])
 
     def test_tool_cli_routes_through_broker(self) -> None:
         env = os.environ.copy()
         env["CYBERBROKER_SOCKET"] = str(self.socket_path)
+        env["CYBERDEFENDER_EXPERIMENT_ID"] = EXPERIMENT_ID
+        env["CYBERDEFENDER_RUN_ID"] = RUN_ID
         before = self.action_log.read_text() if self.action_log.exists() else ""
         result = subprocess.run(
             [sys.executable, "tools/isolate_host.py", "127.0.0.1"],

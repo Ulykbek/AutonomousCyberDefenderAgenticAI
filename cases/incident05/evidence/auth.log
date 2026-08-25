@@ -1,0 +1,3 @@
+2026-08-19T13:04:00Z api-gateway[9100]: token authentication succeeded subject=svc-build source=198.51.100.61
+2026-08-19T13:04:04Z api-gateway[9100]: token authentication succeeded subject=svc-build source=198.51.100.61
+2026-08-19T13:40:00Z sshd[9190]: Accepted publickey for deploy from 10.50.0.30 port 50110 ssh2

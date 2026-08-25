@@ -23,30 +23,48 @@ def handle_request(request: Request) -> dict[str, Any]:
         request.arguments,
         decision,
         request_id=request.request_id,
+        experiment_id=request.experiment_id,
+        run_id=request.run_id,
         component="cyberbroker",
     )
     if not decision.allowed:
         return {
             "request_id": request.request_id,
+            "experiment_id": request.experiment_id,
+            "run_id": request.run_id,
             "status": "DENIED",
             "reason": decision.reason,
         }
     try:
-        result = execute_tool(request.action, request.arguments)
+        result = execute_tool(
+            request.action,
+            request.arguments,
+            {
+                "experiment_id": request.experiment_id,
+                "run_id": request.run_id,
+                "request_id": request.request_id,
+            },
+        )
     except (KeyError, TypeError, ValueError):
         return {
             "request_id": request.request_id,
+            "experiment_id": request.experiment_id,
+            "run_id": request.run_id,
             "status": "FAILED",
             "reason": "TOOL_ARGUMENT_ERROR",
         }
     except Exception:
         return {
             "request_id": request.request_id,
+            "experiment_id": request.experiment_id,
+            "run_id": request.run_id,
             "status": "FAILED",
             "reason": "TOOL_EXECUTION_FAILED",
         }
     return {
         "request_id": request.request_id,
+        "experiment_id": request.experiment_id,
+        "run_id": request.run_id,
         "status": "EXECUTED",
         "reason": "ALLOW",
         "result": result,
