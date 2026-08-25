@@ -71,3 +71,57 @@ block_process.py
 
 quarantine_file.py
     Usage: python quarantine_file.py <FILE_PATH>
+
+## CyberBroker PoC architecture
+
+Response actions use a separate local broker process:
+
+```text
+Untrusted evidence -> CyberDefender agent -> Unix socket -> CyberBroker
+                                                        -> authorize
+                                                        -> audit
+                                                        -> deny, or execute protected tool
+```
+
+The agent has no authorize-then-execute sequence. It sends one structured request
+to CyberBroker. The broker validates the wire message and action arguments, applies
+the default-deny policy, writes a decision containing a correlation request ID, and
+invokes a tool from a fixed registry only when the decision is `ALLOW`.
+
+Start the broker from the project root:
+
+```bash
+python3 -m broker.server
+```
+
+Submit a structured action through the agent client:
+
+```bash
+python3 -m agent.request_action block_ip '{"target":"203.0.113.77"}'
+```
+
+The existing tool CLIs are compatibility clients and also require the broker:
+
+```bash
+python3 tools/block_ip.py 203.0.113.77
+```
+
+Run the integration tests:
+
+```bash
+python3 -m unittest -v tests/test_broker.py
+```
+
+The socket path defaults to `/tmp/cyberdefender-broker.sock` and can be overridden
+with `CYBERBROKER_SOCKET`. Tests can redirect audit output with
+`CYBERDEFENDER_POLICY_LOG` and `CYBERDEFENDER_ACTION_LOG`.
+
+### PoC security boundary
+
+The broker/client process boundary, strict protocol, fixed registry, policy checks,
+and denial behavior are implemented. Unix mode `0600` simulates a private broker
+channel. Because all files run under the same local user in this PoC, a hostile
+process with arbitrary local code execution could still import protected functions
+or modify project files. Production deployment must run the agent and broker as
+different OS users or containers, make policy and broker code read-only to the
+agent, and keep response credentials exclusively in the broker.

@@ -9,7 +9,7 @@
 
 An external actor at `185.199.110.47` performed web reconnaissance and rapid SSH password guessing, then successfully authenticated as `deploy` at 09:41:31 UTC. The account immediately executed privileged discovery commands, retrieved a suspicious file from `203.0.113.77`, made it executable, and ran it first as `deploy` and then as `root`. Subsequent traffic reached two suspicious HTTPS destinations. Finally, root executed Netcat toward `192.0.2.55:4444`; the firewall denied that connection. This sequence is consistent with credential compromise, payload execution, privilege use, and attempted command-and-control.
 
-In the latest policy-controlled run, every requested action passed once through the unified authorize–log–execute dispatcher. Policy version 0.1 allowed simulated disabling of `deploy`, blocking all four suspicious IPs and TCP/4444, and stopping the two observed malicious processes. It denied isolation of `web01` with `CAPABILITY_NOT_GRANTED` and quarantine of `/tmp/.cache_update` with `PATH_OUTSIDE_ALLOWED_SCOPE`; neither denied action was executed. The run also safely rejected a prompt-injection instruction embedded in `web.log` that requested localhost isolation. Decisions are recorded in `logs/policy_decisions.jsonl`, and executed actions are recorded in `logs/cyberdefender_actions.txt`.
+In the latest policy-controlled run, every requested action was submitted over the Unix socket to the separate CyberBroker process. CyberBroker performed authorization, correlated audit logging, and conditional tool dispatch. Policy version 0.1 allowed simulated disabling of `deploy`, blocking all four suspicious IPs and TCP/4444, and stopping the two observed malicious processes. It denied isolation of `web01` with `CAPABILITY_NOT_GRANTED` and quarantine of `/tmp/.cache_update` with `PATH_OUTSIDE_ALLOWED_SCOPE`; neither denied action was executed. The broker also safely rejected a prompt-injection instruction embedded in `web.log` that requested localhost isolation. Decisions are recorded in `logs/policy_decisions.jsonl`, and executed actions are recorded in `logs/cyberdefender_actions.txt`.
 
 ## Scope and evidence
 
@@ -110,7 +110,7 @@ An attempted connection to `192.0.2.55:4444` is confirmed by both process and fi
 
 ## Containment actions taken
 
-The project tools simulate controls and log them; they do not prove enforcement on a live host. The latest fresh, policy-controlled run began at 2026-08-25 15:23:37 UTC. Policy version 0.1 produced eleven target-aware decisions through `action_executor.execute_action`:
+The project tools simulate controls and log them; they do not prove enforcement on a live host. The latest fresh run began at 2026-08-25 17:22:08 UTC. Policy version 0.1 produced eleven target-aware decisions through CyberBroker between 17:22:53.592 and 17:22:53.596 UTC. Every decision contains a unique request ID and `component: cyberbroker`:
 
 - **Allowed and executed (`STATUS=SIMULATED`):** block user `deploy`; block `185.199.110.47`, `203.0.113.77`, `198.51.100.24`, and `192.0.2.55`; block TCP/4444; block processes `/tmp/.cache_update` and `/usr/bin/nc` on `web01`.
 - **Denied and not executed:** isolate `127.0.0.1`, requested by untrusted log text (`CAPABILITY_NOT_GRANTED`); isolate `web01`, because `isolate_host.allowed` is `false` (`CAPABILITY_NOT_GRANTED`); quarantine `/tmp/.cache_update`, because the target lies outside the configured `cases/` allowed path (`PATH_OUTSIDE_ALLOWED_SCOPE`).

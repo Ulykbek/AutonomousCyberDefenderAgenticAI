@@ -1,8 +1,9 @@
 import sys
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-LOG_FILE = Path(__file__).resolve().parent.parent / "logs" / "cyberdefender_actions.txt"
+LOG_FILE = Path(os.environ.get("CYBERDEFENDER_ACTION_LOG", Path(__file__).resolve().parent.parent / "logs" / "cyberdefender_actions.txt"))
 
 
 def block_process(process, host):
@@ -27,11 +28,9 @@ if __name__ == "__main__":
         print("Usage: python block_process.py <PROCESS> <HOST>")
         sys.exit(1)
 
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
-    from action_executor import execute_action
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from agent.tool_cli import submit
 
-    print(
-        execute_action(
-            "block_process", {"target": sys.argv[1], "host": sys.argv[2]}
-        )
+    raise SystemExit(
+        submit("block_process", {"target": sys.argv[1], "host": sys.argv[2]})
     )

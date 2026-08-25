@@ -11,6 +11,14 @@ from typing import Any, Mapping
 
 POLICY_FILE = Path(__file__).resolve().parent.parent / "policies" / "cyberdefender_policy.json"
 PRIVATE_NETWORKS = tuple(ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
+ARGUMENT_SCHEMAS = {
+    "block_ip": ({"target"}, {"reason"}),
+    "block_port": ({"target"}, {"protocol"}),
+    "block_process": ({"target", "host"}, set()),
+    "block_user": ({"target"}, set()),
+    "isolate_host": ({"target"}, set()),
+    "quarantine_file": ({"target"}, set()),
+}
 
 
 @dataclass(frozen=True)
@@ -44,6 +52,8 @@ def _constraint_violation(action: str, target: str, constraints: Mapping) -> str
             port = int(target.split("/", 1)[0])
         except ValueError:
             return "INVALID_PORT"
+        if not 1 <= port <= 65535:
+            return "INVALID_PORT"
         if port in constraints.get("protected_ports", []):
             return "PROTECTED_PORT"
     if action == "quarantine_file":
@@ -68,8 +78,23 @@ def authorize(action: str, args: Mapping[str, Any]) -> Decision:
     capability = capabilities[action]
     if not capability.get("allowed", False):
         return _deny("CAPABILITY_NOT_GRANTED", capability, version)
+    if not isinstance(args, Mapping):
+        return _deny("INVALID_ARGUMENTS", capability, version)
+    required, optional = ARGUMENT_SCHEMAS.get(action, ({"target"}, set()))
+    provided = set(args)
+    if not required.issubset(provided) or not provided.issubset(required | optional):
+        return _deny("INVALID_ARGUMENTS", capability, version)
     target = args.get("target")
     if not isinstance(target, str) or not target:
+        return _deny("INVALID_ARGUMENTS", capability, version)
+    if action == "block_process" and (
+        not isinstance(args.get("host"), str) or not args["host"]
+    ):
+        return _deny("INVALID_ARGUMENTS", capability, version)
+    if action == "block_port" and (
+        not isinstance(args.get("protocol", "TCP"), str)
+        or args.get("protocol", "TCP").upper() not in {"TCP", "UDP"}
+    ):
         return _deny("INVALID_ARGUMENTS", capability, version)
     violation = _constraint_violation(action, target, capability.get("constraints", {}))
     if violation:
