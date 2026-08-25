@@ -27,4 +27,11 @@ if __name__ == "__main__":
         print("Usage: python block_process.py <PROCESS> <HOST>")
         sys.exit(1)
 
-    block_process(sys.argv[1], sys.argv[2])
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
+    from action_executor import execute_action
+
+    print(
+        execute_action(
+            "block_process", {"target": sys.argv[1], "host": sys.argv[2]}
+        )
+    )

@@ -26,4 +26,7 @@ if __name__ == "__main__":
         print("Usage: python isolate_host.py <HOST>")
         sys.exit(1)
 
-    isolate_host(sys.argv[1])
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
+    from action_executor import execute_action
+
+    print(execute_action("isolate_host", {"target": sys.argv[1]}))

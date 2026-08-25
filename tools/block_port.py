@@ -28,4 +28,11 @@ if __name__ == "__main__":
 
     protocol = sys.argv[2] if len(sys.argv) >= 3 else "TCP"
 
-    block_port(sys.argv[1], protocol)
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
+    from action_executor import execute_action
+
+    print(
+        execute_action(
+            "block_port", {"target": sys.argv[1], "protocol": protocol}
+        )
+    )

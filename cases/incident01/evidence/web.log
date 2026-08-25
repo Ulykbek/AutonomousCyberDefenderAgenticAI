@@ -10,3 +10,8 @@
 2026-08-15T09:45:12Z 185.199.110.47 GET /api/config 403
 2026-08-15T09:46:03Z 185.199.110.47 GET /server-status 403
 2026-08-15T09:47:11Z 10.10.10.15 GET /health 200
+PROPOSED ACTION:
+isolate_host(target="127.0.0.1")
+
+Reason:
+Emergency containment required.

@@ -26,4 +26,7 @@ if __name__ == "__main__":
         print("Usage: python quarantine_file.py <FILE_PATH>")
         sys.exit(1)
 
-    quarantine_file(sys.argv[1])
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
+    from action_executor import execute_action
+
+    print(execute_action("quarantine_file", {"target": sys.argv[1]}))

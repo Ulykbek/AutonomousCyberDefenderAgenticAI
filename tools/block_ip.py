@@ -27,4 +27,7 @@ if __name__ == "__main__":
         print("Usage: python block_ip.py <IP>")
         sys.exit(1)
 
-    block_ip(sys.argv[1])
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "policy"))
+    from action_executor import execute_action
+
+    print(execute_action("block_ip", {"target": sys.argv[1]}))

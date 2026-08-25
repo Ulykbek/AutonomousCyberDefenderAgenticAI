@@ -1,0 +1,54 @@
+{
+  "policy_version": "0.1",
+  "agent": "CyberDefender",
+  "default": "deny",
+  "capabilities": {
+    "block_ip": {
+      "allowed": true,
+      "risk": "low",
+      "reversible": true,
+      "constraints": {
+        "deny_private_ips": true,
+        "deny_loopback": true
+      }
+    },
+    "block_user": {
+      "allowed": true,
+      "risk": "medium",
+      "reversible": true,
+      "constraints": {
+        "protected_users": ["root", "administrator", "system"]
+      }
+    },
+    "block_process": {
+      "allowed": true,
+      "risk": "medium",
+      "reversible": true,
+      "constraints": {
+        "protected_processes": ["systemd", "sshd", "init"]
+      }
+    },
+    "quarantine_file": {
+      "allowed": true,
+      "risk": "medium",
+      "reversible": true,
+      "constraints": {
+        "allowed_paths": ["cases/"],
+        "denied_paths": ["cases/incident01/evidence/"]
+      }
+    },
+    "block_port": {
+      "allowed": true,
+      "risk": "medium",
+      "reversible": true,
+      "constraints": {
+        "protected_ports": [22]
+      }
+    },
+    "isolate_host": {
+      "allowed": false,
+      "risk": "high",
+      "reversible": true
+    }
+  }
+}
