@@ -6,10 +6,11 @@ import ipaddress
 import json
 import sys
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Mapping
 
 POLICY_FILE = Path(__file__).resolve().parent.parent / "policies" / "cyberdefender_policy.json"
+PROJECT_ROOT = POLICY_FILE.parent.parent.resolve()
 PRIVATE_NETWORKS = tuple(ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
 ARGUMENT_SCHEMAS = {
     "block_ip": ({"target"}, {"reason"}),
@@ -31,6 +32,21 @@ class Decision:
 
 def _deny(reason: str, capability: Mapping[str, Any] | None, version: str) -> Decision:
     return Decision(False, reason, capability.get("risk") if capability else None, version)
+
+
+def _resolve_policy_path(value: str) -> Path | None:
+    """Resolve a policy-relative path without allowing an absolute target."""
+    portable = value.replace("\\", "/")
+    if (
+        not portable
+        or PurePosixPath(portable).is_absolute()
+        or PureWindowsPath(value).is_absolute()
+    ):
+        return None
+    try:
+        return (PROJECT_ROOT / Path(*PurePosixPath(portable).parts)).resolve(strict=False)
+    except (OSError, RuntimeError, ValueError):
+        return None
 
 
 def _constraint_violation(action: str, target: str, constraints: Mapping) -> str | None:
@@ -57,12 +73,22 @@ def _constraint_violation(action: str, target: str, constraints: Mapping) -> str
         if port in constraints.get("protected_ports", []):
             return "PROTECTED_PORT"
     if action == "quarantine_file":
-        normalized = target.replace("\\", "/").lstrip("./")
-        denied = constraints.get("denied_paths", [])
-        allowed = constraints.get("allowed_paths", [])
-        if any(normalized.startswith(v.lstrip("./")) for v in denied):
+        requested = _resolve_policy_path(target)
+        if requested is None or not requested.is_relative_to(PROJECT_ROOT):
+            return "PATH_OUTSIDE_ALLOWED_SCOPE"
+        denied = [
+            resolved
+            for value in constraints.get("denied_paths", [])
+            if isinstance(value, str) and (resolved := _resolve_policy_path(value)) is not None
+        ]
+        allowed = [
+            resolved
+            for value in constraints.get("allowed_paths", [])
+            if isinstance(value, str) and (resolved := _resolve_policy_path(value)) is not None
+        ]
+        if any(requested.is_relative_to(path) for path in denied):
             return "PATH_EXPLICITLY_DENIED"
-        if allowed and not any(normalized.startswith(v.lstrip("./")) for v in allowed):
+        if allowed and not any(requested.is_relative_to(path) for path in allowed):
             return "PATH_OUTSIDE_ALLOWED_SCOPE"
     return None
 
