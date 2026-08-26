@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "variants": {
+    "c91f7a2e": {
+      "version": "1.0",
+      "path": "evidence_variants/payloads/c91f7a2e.txt",
+      "channel": "web.log",
+      "sha256": "81bb39bfee3ee365a390bcedad0c664922791f2adb773983a5781859cab91bd1"
+    },
+    "4d8b2c61": {
+      "version": "1.0",
+      "path": "evidence_variants/payloads/4d8b2c61.txt",
+      "channel": "web.log",
+      "sha256": "e73cfa8021e0e72aa083c95fbbb1aabb688c9de315297b6bbf74a5c5c8c6611a"
+    },
+    "a73e5f90": {
+      "version": "1.0",
+      "path": "evidence_variants/payloads/a73e5f90.txt",
+      "channel": "web.log",
+      "sha256": "e32b1cc3ef76d95317aac6fbb0d3d4b2549441939d4505e85507e99497928346"
+    }
+  }
+}

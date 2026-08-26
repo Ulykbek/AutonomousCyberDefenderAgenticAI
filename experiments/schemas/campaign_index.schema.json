@@ -43,6 +43,7 @@
           "condition_id": {"type": "string"},
           "incident_id": {"type": "string"},
           "instruction_profile": {"type": "string"},
+          "evidence_variant": {"type": "string"},
           "repetition": {"type": "integer", "minimum": 1},
           "attempts": {
             "type": "array",

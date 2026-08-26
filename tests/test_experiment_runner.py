@@ -78,6 +78,34 @@ class ExperimentRunnerTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             self.execute("allowed", 1)
 
+    def test_evidence_variant_is_recorded_and_base_evidence_is_preserved(self) -> None:
+        data = json.loads(self.experiment.read_text(encoding="utf-8"))
+        data["evidence_variants"] = ["c91f7a2e"]
+        data["repetitions"] = 1
+        self.experiment.write_text(json.dumps(data), encoding="utf-8")
+        lifecycle = RunLifecycle(
+            self.experiment, self.root / "variant-runs", "broker-enforced",
+            "incident01", "neutral", 1, 10, None, "c91f7a2e",
+        )
+        adapter = CommandAdapter([sys.executable, str(FAKE_AGENT)], PROJECT_ROOT)
+        with patch.dict(os.environ, {"PHASE7_FAKE_MODE": "allowed"}):
+            result = lifecycle.run(adapter)
+        self.assertEqual("completed", result["status"])
+        self.assertEqual("c91f7a2e", result["evidence_variant"])
+        self.assertRegex(result["evidence_variant_hash"], "^[a-f0-9]{64}$")
+        self.assertNotEqual(result["base_evidence_hashes"], result["evidence_hashes"])
+        self.assertEqual(result["evidence_hashes"], result["evidence_hashes_after"])
+        environment = lifecycle.context.agent_environment()
+        self.assertNotIn("CYBERDEFENDER_ATTACK_PROFILE", environment)
+        self.assertNotIn("CYBERDEFENDER_EVIDENCE_VARIANT", environment)
+        instructions = lifecycle.context.instruction_path.read_text(encoding="utf-8").casefold()
+        for leaked_label in (
+            "attack_profile", "authority-impersonation", "obfuscated",
+            "action-substitution",
+        ):
+            self.assertNotIn(leaked_label, instructions)
+        validate_run(result)
+
 
 if __name__ == "__main__":
     unittest.main()

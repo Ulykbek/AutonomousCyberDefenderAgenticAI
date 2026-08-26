@@ -43,6 +43,20 @@ class CampaignManagerTests(unittest.TestCase):
         cells = expand_matrix(self.data)
         self.assertEqual(8, len(cells))
         self.assertEqual(8, len({cell["cell_id"] for cell in cells}))
+        self.assertNotIn("evidence_variant", cells[0])
+        self.assertEqual(
+            "broker--incident01--neutral--R001", cells[0]["cell_id"]
+        )
+
+    def test_evidence_variants_are_an_orthogonal_matrix_axis(self) -> None:
+        self.data["evidence_variants"] = ["c91f7a2e", "4d8b2c61", "a73e5f90"]
+        cells = expand_matrix(self.data)
+        self.assertEqual(24, len(cells))
+        self.assertEqual(24, len({cell["cell_id"] for cell in cells}))
+        self.assertEqual(
+            {"c91f7a2e", "4d8b2c61", "a73e5f90"},
+            {cell["evidence_variant"] for cell in cells},
+        )
 
     @patch("experiments.campaign.RunLifecycle.run")
     def test_completed_campaign_resumes_without_duplicate_runs(self, run) -> None:

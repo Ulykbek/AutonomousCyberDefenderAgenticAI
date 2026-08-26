@@ -27,25 +27,40 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def cell_id(condition: str, incident: str, profile: str, repetition: int) -> str:
-    return f"{condition}--{incident}--{profile}--R{repetition:03d}"
+def cell_id(
+    condition: str, incident: str, profile: str, repetition: int,
+    evidence_variant: str | None = None,
+) -> str:
+    variant_component = "" if evidence_variant is None else f"--{evidence_variant}"
+    return f"{condition}--{incident}--{profile}{variant_component}--R{repetition:03d}"
 
 
 def expand_matrix(experiment: dict[str, Any]) -> list[dict[str, Any]]:
-    return [
-        {
-            "cell_id": cell_id(condition["condition_id"], incident, profile, repetition),
-            "condition_id": condition["condition_id"],
-            "incident_id": incident,
-            "instruction_profile": profile,
-            "repetition": repetition,
-            "attempts": [],
-        }
-        for condition in experiment["conditions"]
-        for incident in experiment["incident_ids"]
-        for profile in experiment["instruction_profiles"]
-        for repetition in range(1, experiment["repetitions"] + 1)
-    ]
+    cells = []
+    evidence_variants = experiment.get("evidence_variants")
+    variants: list[str | None] = (
+        [None] if evidence_variants is None else evidence_variants
+    )
+    for condition in experiment["conditions"]:
+        for incident in experiment["incident_ids"]:
+            for profile in experiment["instruction_profiles"]:
+                for variant in variants:
+                    for repetition in range(1, experiment["repetitions"] + 1):
+                        cell = {
+                            "cell_id": cell_id(
+                                condition["condition_id"], incident, profile,
+                                repetition, variant,
+                            ),
+                            "condition_id": condition["condition_id"],
+                            "incident_id": incident,
+                            "instruction_profile": profile,
+                            "repetition": repetition,
+                            "attempts": [],
+                        }
+                        if variant is not None:
+                            cell["evidence_variant"] = variant
+                        cells.append(cell)
+    return cells
 
 
 class CampaignManager:
@@ -137,6 +152,7 @@ class CampaignManager:
                 self.experiment["experiment_id"], cell["condition_id"],
                 cell["incident_id"], cell["instruction_profile"],
                 cell["repetition"], attempt_number,
+                cell.get("evidence_variant", "BASE"),
             )
             attempt = {
                 "attempt": attempt_number,
@@ -155,6 +171,7 @@ class CampaignManager:
                 self.experiment_path, self.output_root, cell["condition_id"],
                 cell["incident_id"], cell["instruction_profile"],
                 cell["repetition"], self.timeout_seconds, attempt_number,
+                cell.get("evidence_variant", "BASE"),
             )
             result = lifecycle.run(CommandAdapter(self.command, PROJECT_ROOT))
             status = result["status"]

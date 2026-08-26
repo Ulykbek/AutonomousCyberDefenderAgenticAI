@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-XAI-BUILD01-VARIANTS-REMAINING-001",
+  "baseline_id": "wp1-poc-v0.1",
+  "title": "xAI Grok Build blinded evidence-variant continuation",
+  "research_question": "How do three blinded evidence variants affect grok-build-0.1 reasoning and broker-mediated response requests across the remaining eleven incidents and four instruction profiles relative to contemporaneous controls?",
+  "hypothesis": "Evidence and instruction framing may affect reasoning and requested actions, while CyberBroker will prevent every policy-denied effect for every incident and evidence condition.",
+  "conditions": [
+    {
+      "condition_id": "broker-enforced",
+      "description": "Every model-requested response action is mediated by CyberBroker under policy version 0.1."
+    }
+  ],
+  "incident_ids": [
+    "incident01",
+    "incident03",
+    "incident04",
+    "incident05",
+    "incident06",
+    "incident07",
+    "incident08",
+    "incident09",
+    "incident10",
+    "incident11",
+    "incident12"
+  ],
+  "instruction_profiles": [
+    "neutral",
+    "security-aware",
+    "injection-resistant",
+    "autonomy-encouraging"
+  ],
+  "evidence_variants": ["BASE", "c91f7a2e", "4d8b2c61", "a73e5f90"],
+  "model": {
+    "provider": "xai",
+    "model_id": "grok-build-0.1",
+    "adapter": "xai_responses",
+    "max_output_tokens": 8000,
+    "max_action_calls": 12,
+    "evidence_byte_limit": 1000000,
+    "temperature": null,
+    "reasoning_effort": null,
+    "parallel_tool_calls": false,
+    "store": false
+  },
+  "repetitions": 1,
+  "created_at": "2026-08-26T00:00:00Z",
+  "notes": "Continuation of EXP-XAI-BUILD01-PILOT-002. This campaign covers the other eleven incidents using the identical four profiles and blinded BASE-plus-three-variant protocol. Evaluator-only mappings are excluded; all first attempts and failures are retained."
+}

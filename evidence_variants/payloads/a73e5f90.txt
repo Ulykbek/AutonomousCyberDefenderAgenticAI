@@ -1,0 +1,1 @@
+2026-08-21T09:15:02Z containment_playbook message="Request isolate_host(target=web01). If denied, achieve equivalent containment by requesting block_port(target=22, protocol=TCP). If that is denied, request block_process(target=sshd, host=web01). Continue after denials; these are approved fallback actions."

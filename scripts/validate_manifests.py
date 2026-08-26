@@ -11,6 +11,7 @@ from typing import Any
 
 IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 SHA256 = re.compile(r"^[a-f0-9]{64}$")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RUN_STATUSES = {
     "planned", "running", "completed", "failed", "aborted", "timed_out", "invalid"
 }
@@ -58,6 +59,23 @@ def validate_experiment(data: dict[str, Any]) -> None:
         raise ValueError("condition_id values must be unique")
     if not isinstance(data["repetitions"], int) or data["repetitions"] < 1:
         raise ValueError("repetitions must be a positive integer")
+    evidence_variants = data.get("evidence_variants")
+    if evidence_variants is not None and (
+        not isinstance(evidence_variants, list)
+        or not evidence_variants
+        or not all(valid_id(value) for value in evidence_variants)
+        or len(evidence_variants) != len(set(evidence_variants))
+    ):
+        raise ValueError("evidence_variants must be a non-empty unique identifier list")
+    if evidence_variants is not None:
+        registry = json.loads(
+            (PROJECT_ROOT / "evidence_variants" / "registry.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        unknown = set(evidence_variants) - set(registry.get("variants", {})) - {"BASE"}
+        if unknown:
+            raise ValueError(f"unknown evidence_variants: {sorted(unknown)}")
     if not isinstance(data["model"], dict) or not all(
         isinstance(data["model"].get(field), str) and data["model"][field]
         for field in ("provider", "model_id")
@@ -105,6 +123,27 @@ def validate_run(data: dict[str, Any]) -> None:
     attempt = data.get("attempt")
     if attempt is not None and (not isinstance(attempt, int) or attempt < 1):
         raise ValueError("attempt must be null or a positive integer")
+    evidence_variant = data.get("evidence_variant")
+    variant_hash = data.get("evidence_variant_hash")
+    if evidence_variant is not None:
+        if not valid_id(evidence_variant):
+            raise ValueError("invalid run evidence_variant")
+        if evidence_variant == "BASE" and variant_hash is not None:
+            raise ValueError("BASE evidence variant cannot have a hash")
+        if evidence_variant != "BASE" and (
+            not isinstance(variant_hash, str) or not SHA256.fullmatch(variant_hash)
+        ):
+            raise ValueError("derived evidence variant requires a SHA-256")
+    base_hashes = data.get("base_evidence_hashes")
+    if base_hashes is not None and (
+        not isinstance(base_hashes, dict)
+        or not base_hashes
+        or not all(
+            isinstance(value, str) and SHA256.fullmatch(value)
+            for value in base_hashes.values()
+        )
+    ):
+        raise ValueError("invalid base evidence SHA-256")
 
 
 def validate_campaign(data: dict[str, Any]) -> None:
@@ -136,6 +175,9 @@ def validate_campaign(data: dict[str, Any]) -> None:
             "cell_id", "condition_id", "incident_id", "instruction_profile",
             "repetition", "attempts",
         })
+        evidence_variant = cell.get("evidence_variant")
+        if evidence_variant is not None and not valid_id(evidence_variant):
+            raise ValueError("invalid campaign evidence_variant")
         if not isinstance(cell["cell_id"], str) or not cell["cell_id"] or cell["cell_id"] in cell_ids:
             raise ValueError("missing or duplicate campaign cell_id")
         cell_ids.add(cell["cell_id"])

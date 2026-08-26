@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from experiments.adapters.base import AgentAdapter, AgentResult
+from experiments.evidence_variants import apply_evidence_variant, load_evidence_variant
 from experiments.context import RunContext
 from experiments.correlation import validate_correlation
 from scripts.validate_manifests import validate_experiment
@@ -52,8 +53,13 @@ def make_run_id(
     profile_id: str,
     repetition: int,
     attempt: int | None = None,
+    evidence_variant: str = "BASE",
 ) -> str:
-    value = f"{experiment_id}-{condition_id}-{incident_id}-{profile_id}-R{repetition:03d}"
+    variant_component = "" if evidence_variant == "BASE" else f"-{evidence_variant}"
+    value = (
+        f"{experiment_id}-{condition_id}-{incident_id}-{profile_id}"
+        f"{variant_component}-R{repetition:03d}"
+    )
     if attempt is not None:
         if attempt < 1:
             raise ValueError("attempt must be positive")
@@ -74,6 +80,7 @@ class RunLifecycle:
         repetition: int,
         timeout_seconds: float,
         attempt: int | None = None,
+        evidence_variant: str = "BASE",
     ):
         self.experiment_path = experiment_manifest.resolve()
         self.output_root = output_root.resolve()
@@ -83,6 +90,7 @@ class RunLifecycle:
         self.repetition = repetition
         self.timeout_seconds = timeout_seconds
         self.attempt = attempt
+        self.evidence_variant = evidence_variant
         self.manifest: dict[str, Any] = {}
         self.context: RunContext | None = None
         self.broker: subprocess.Popen[str] | None = None
@@ -100,6 +108,11 @@ class RunLifecycle:
             raise ValueError(f"incident not selected by experiment: {self.incident_id}")
         if self.profile_id not in experiment["instruction_profiles"]:
             raise ValueError(f"profile not selected by experiment: {self.profile_id}")
+        selected_variants = experiment.get("evidence_variants", ["BASE"])
+        if self.evidence_variant not in selected_variants:
+            raise ValueError(
+                f"evidence variant not selected by experiment: {self.evidence_variant}"
+            )
         if not 1 <= self.repetition <= experiment["repetitions"]:
             raise ValueError("repetition outside experiment range")
 
@@ -117,7 +130,7 @@ class RunLifecycle:
 
         run_id = make_run_id(
             experiment["experiment_id"], self.condition_id, self.incident_id,
-            self.profile_id, self.repetition, self.attempt,
+            self.profile_id, self.repetition, self.attempt, self.evidence_variant,
         )
         run_dir = self.output_root / experiment["experiment_id"] / run_id
         run_dir.mkdir(parents=True, exist_ok=False)
@@ -135,10 +148,15 @@ class RunLifecycle:
         source_evidence = PROJECT_ROOT / "cases" / self.incident_id / "evidence"
         if not source_evidence.is_dir():
             raise ValueError(f"missing evidence directory: {source_evidence}")
+        base_evidence_hashes = file_hashes(source_evidence)
         for source in sorted(source_evidence.iterdir()):
             if source.is_file():
                 destination = evidence_dir / source.name
                 shutil.copy2(source, destination)
+        variant = load_evidence_variant(self.evidence_variant)
+        apply_evidence_variant(evidence_dir, variant)
+        for destination in evidence_dir.iterdir():
+            if destination.is_file():
                 destination.chmod(0o444)
         shutil.copy2(PROJECT_ROOT / "tools" / "start.py", tools_dir / "start.py")
         (tools_dir / "start.py").chmod(0o555)
@@ -189,12 +207,15 @@ class RunLifecycle:
             "baseline_id": experiment["baseline_id"],
             "incident_id": self.incident_id,
             "instruction_profile": self.profile_id,
+            "evidence_variant": self.evidence_variant,
+            "evidence_variant_hash": None if variant is None else variant.sha256,
             "attempt": self.attempt,
             "model": experiment["model"],
             "seed": experiment.get("seed"),
             "started_at": now(),
             "completed_at": None,
             "evidence_hashes": before,
+            "base_evidence_hashes": base_evidence_hashes,
             "evidence_hashes_after": None,
             "output_hashes": None,
             "instruction_hashes": {

@@ -26,12 +26,19 @@
     "baseline_id": {"type": "string", "minLength": 1},
     "incident_id": {"type": "string", "minLength": 1},
     "instruction_profile": {"type": "string", "minLength": 1},
+    "evidence_variant": {"type": "string", "minLength": 1},
+    "evidence_variant_hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
     "model": {"type": "object", "additionalProperties": true},
     "seed": {"type": ["integer", "null"]},
     "attempt": {"type": ["integer", "null"], "minimum": 1},
     "started_at": {"type": ["string", "null"], "format": "date-time"},
     "completed_at": {"type": ["string", "null"], "format": "date-time"},
     "evidence_hashes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+    },
+    "base_evidence_hashes": {
       "type": "object",
       "minProperties": 1,
       "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}

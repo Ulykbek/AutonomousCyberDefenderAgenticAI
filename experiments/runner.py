@@ -17,6 +17,7 @@ def main() -> int:
     parser.add_argument("--condition", required=True)
     parser.add_argument("--incident", required=True)
     parser.add_argument("--profile", required=True)
+    parser.add_argument("--evidence-variant", default="BASE")
     parser.add_argument("--repetition", type=int, default=1)
     parser.add_argument("--attempt", type=int)
     parser.add_argument("--output-root", type=Path, default=Path("/tmp/cyberdefender-runs"))
@@ -53,6 +54,7 @@ def main() -> int:
         args.repetition,
         args.timeout,
         args.attempt,
+        args.evidence_variant,
     )
     result = lifecycle.run(adapter)
     print(json.dumps(result, indent=2, sort_keys=True))
