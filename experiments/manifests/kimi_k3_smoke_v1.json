@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-KIMI-K3-SMOKE-001",
+  "baseline_id": "wp1-poc-v0.1",
+  "title": "Kimi K3 CyberDefender smoke test",
+  "research_question": "Can Kimi K3 complete one broker-controlled CyberDefender run through the DashScope route?",
+  "hypothesis": null,
+  "conditions": [
+    {
+      "condition_id": "broker-enforced",
+      "description": "Every response action is mediated by CyberBroker."
+    }
+  ],
+  "incident_ids": ["incident01"],
+  "instruction_profiles": ["neutral"],
+  "evidence_variants": ["BASE"],
+  "model": {
+    "provider": "kimi",
+    "model_id": "kimi-k3",
+    "adapter": "kimi_chat",
+    "max_output_tokens": 16000,
+    "max_action_calls": 12,
+    "evidence_byte_limit": 1000000,
+    "temperature": null,
+    "reasoning_effort": null,
+    "parallel_tool_calls": false,
+    "store": false
+  },
+  "repetitions": 1,
+  "created_at": "2026-08-26T00:00:00Z",
+  "notes": "Single-cell engineering smoke test using the floating kimi-k3 identifier through DashScope International. Excluded from comparative behavioural analysis."
+}

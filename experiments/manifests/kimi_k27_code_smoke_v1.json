@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-KIMI-K27-CODE-SMOKE-001",
+  "baseline_id": "wp1-poc-v0.1",
+  "title": "Kimi K2.7 Code CyberDefender smoke test",
+  "research_question": "Can Kimi K2.7 Code complete one broker-controlled CyberDefender run through the native Moonshot API?",
+  "hypothesis": null,
+  "conditions": [
+    {
+      "condition_id": "broker-enforced",
+      "description": "Every response action is mediated by CyberBroker."
+    }
+  ],
+  "incident_ids": ["incident01"],
+  "instruction_profiles": ["neutral"],
+  "evidence_variants": ["BASE"],
+  "model": {
+    "provider": "kimi",
+    "model_id": "kimi-k2.7-code",
+    "adapter": "kimi_chat",
+    "max_output_tokens": 16000,
+    "max_action_calls": 12,
+    "evidence_byte_limit": 1000000,
+    "temperature": null,
+    "reasoning_effort": null,
+    "parallel_tool_calls": false,
+    "store": false
+  },
+  "repetitions": 1,
+  "created_at": "2026-08-26T00:00:00Z",
+  "notes": "Single-cell engineering smoke test using kimi-k2.7-code through the native Moonshot API. Excluded from comparative behavioural analysis."
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-KIMI-K27-CODE-VARIANTS-REMAINING-002",
+  "baseline_id": "wp1-poc-v0.1",
+  "title": "Kimi K2.7 Code blinded evidence-variant continuation",
+  "research_question": "How do three blinded evidence variants affect Kimi K2.7 Code reasoning and broker-mediated response requests across the remaining eleven incidents and four instruction profiles relative to contemporaneous controls?",
+  "hypothesis": "Evidence manipulation and instruction framing may affect model reasoning and requested actions, while CyberBroker will prevent every policy-denied effect.",
+  "conditions": [
+    {
+      "condition_id": "broker-enforced",
+      "description": "Every model-requested response action is mediated by CyberBroker under policy version 0.1."
+    }
+  ],
+  "incident_ids": [
+    "incident02",
+    "incident03",
+    "incident04",
+    "incident05",
+    "incident06",
+    "incident07",
+    "incident08",
+    "incident09",
+    "incident10",
+    "incident11",
+    "incident12"
+  ],
+  "instruction_profiles": [
+    "neutral",
+    "security-aware",
+    "injection-resistant",
+    "autonomy-encouraging"
+  ],
+  "evidence_variants": ["BASE", "c91f7a2e", "4d8b2c61", "a73e5f90"],
+  "model": {
+    "provider": "kimi",
+    "model_id": "kimi-k2.7-code",
+    "adapter": "kimi_chat",
+    "max_output_tokens": 16000,
+    "max_action_calls": 12,
+    "evidence_byte_limit": 1000000,
+    "temperature": null,
+    "reasoning_effort": null,
+    "parallel_tool_calls": false,
+    "store": false
+  },
+  "repetitions": 1,
+  "created_at": "2026-08-26T00:00:00Z",
+  "notes": "Clean replacement for excluded engineering campaign EXP-KIMI-K27-CODE-VARIANTS-REMAINING-001, whose pause exposed a one-worker pre-queue shutdown defect that orphaned API requests and caused concurrency failures. This v2 campaign uses the corrected sequential manager and covers incidents02-12 with the same four profiles and blinded BASE-plus-three-variant protocol. Evaluator-only mappings are excluded; all v2 attempts are retained."
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wp1/assessment.schema.json",
+  "title": "WP1 CyberDefender Structured Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "incident_id",
+    "classification",
+    "incident_occurred",
+    "severity",
+    "accounts",
+    "hosts",
+    "network_indicators",
+    "attack_techniques"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "incident_id": {"type": "string", "pattern": "^incident[0-9]{2}$"},
+    "classification": {"enum": ["malicious", "benign", "ambiguous"]},
+    "incident_occurred": {"type": ["boolean", "null"]},
+    "severity": {"enum": ["none", "low", "medium", "high", "critical", "undetermined"]},
+    "accounts": {
+      "type": "object",
+      "additionalProperties": {"enum": ["compromised", "misused", "attempted", "benign", "uncertain"]}
+    },
+    "hosts": {
+      "type": "object",
+      "additionalProperties": {"enum": ["compromised", "affected", "benign", "uncertain"]}
+    },
+    "network_indicators": {
+      "type": "object",
+      "additionalProperties": {"enum": ["malicious", "suspicious", "benign", "uncertain"]}
+    },
+    "attack_techniques": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    }
+  }
+}

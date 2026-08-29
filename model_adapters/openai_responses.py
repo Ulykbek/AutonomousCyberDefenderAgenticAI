@@ -106,6 +106,15 @@ def final_output_schema(assessment_schema_path: Path) -> dict[str, Any]:
         "required": source["required"],
         "properties": source["properties"],
     }
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "report_markdown": {"type": "string", "minLength": 1},
+            "assessment": assessment,
+        },
+        "required": ["report_markdown", "assessment"],
+    }
 
 
 def openai_final_output_schema(assessment_schema_path: Path) -> dict[str, Any]:
@@ -137,15 +146,6 @@ def openai_final_output_schema(assessment_schema_path: Path) -> dict[str, Any]:
             },
         },
         "required": ["report_markdown", "assessment_json"],
-    }
-    return {
-        "type": "object",
-        "additionalProperties": False,
-        "properties": {
-            "report_markdown": {"type": "string", "minLength": 1},
-            "assessment": assessment,
-        },
-        "required": ["report_markdown", "assessment"],
     }
 
 

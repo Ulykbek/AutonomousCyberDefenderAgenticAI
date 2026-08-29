@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/model_adapters/openrouter_chat.py", line 78, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/model_adapters/openrouter_chat.py", line 73, in main
+    adapter.run(context)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/model_adapters/deepseek_chat.py", line 237, in run
+    response = self.client.chat.completions.create(**parameters)
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/.venv-openai/lib/python3.13/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/.venv-openai/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1296, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<53 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/.venv-openai/lib/python3.13/site-packages/openai/_base_client.py", line 1381, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ulkbk/Documents/PhD/AutonomousCyberDefenderAgenticAI/.venv-openai/lib/python3.13/site-packages/openai/_base_client.py", line 1154, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': 'Provider returned error', 'code': 400, 'metadata': {'raw': '{\n  "error": {\n    "message": "Invalid schema for function \'submit_final_report\': In context=(\'properties\', \'schema_version\'), schema must have a \'type\' key.",\n    "type": "invalid_request_error",\n    "param": "tools[6].parameters",\n    "code": "invalid_function_parameters"\n  }\n}', 'provider_name': 'OpenAI', 'is_byok': False, 'provider_error_code': 'invalid_function_parameters'}}, 'user_id': 'user_3IQAwQjEa12hYIY2AFtn2GyQhmi'}

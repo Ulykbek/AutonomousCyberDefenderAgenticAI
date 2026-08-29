@@ -117,6 +117,17 @@ class CampaignManagerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "manifest changed"):
             self.manager()
 
+    def test_single_worker_does_not_prequeue_cells_on_interrupt(self) -> None:
+        manager = CampaignManager(
+            self.manifest, self.root / "runs", self.command, 10, 1, False
+        )
+        with patch.object(
+            manager, "_execute_cell", side_effect=KeyboardInterrupt
+        ) as execute:
+            with self.assertRaises(KeyboardInterrupt):
+                manager.run()
+        self.assertEqual(1, execute.call_count)
+
 
 if __name__ == "__main__":
     unittest.main()

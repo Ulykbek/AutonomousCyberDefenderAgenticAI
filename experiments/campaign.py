@@ -193,10 +193,17 @@ class CampaignManager:
         self.state["max_workers_last_run"] = self.max_workers
         self.state["updated_at"] = now()
         self._write_state()
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = [executor.submit(self._execute_cell, cell) for cell in runnable]
-            for future in as_completed(futures):
-                future.result()
+        if self.max_workers == 1:
+            # Keep sequential campaigns genuinely sequential. Pre-submitting every
+            # cell to a one-worker executor allows queued work to continue during
+            # interpreter shutdown after Ctrl-C and can orphan provider requests.
+            for cell in runnable:
+                self._execute_cell(cell)
+        else:
+            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                futures = [executor.submit(self._execute_cell, cell) for cell in runnable]
+                for future in as_completed(futures):
+                    future.result()
         completed = sum(
             bool(cell["attempts"] and cell["attempts"][-1]["status"] == "completed")
             for cell in self.state["cells"]
