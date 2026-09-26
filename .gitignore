@@ -6,3 +6,9 @@ __pycache__/
 .env.*
 !.env.example
 .DS_Store
+
+# Publication scope: private research and generated exports
+PhD_Proposal_Bounded_Autonomy.docx
+docs/WP1_CYBERBROKER_EXPERIMENT_REPRODUCTION.md
+docs/WP1_EXPERIMENT_SIMPLE_EXPLANATION.md
+release-dist/
